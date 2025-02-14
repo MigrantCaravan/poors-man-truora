@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { CameraCapture } from '@/components/CameraCapture';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Compare } from 'lucide-react';
+import { GitCompare } from 'lucide-react';
 
 const Index = () => {
   const [selfieImage, setSelfieImage] = useState<string | null>(null);
@@ -95,7 +95,7 @@ const Index = () => {
               disabled={!selfieImage || !idImage}
               className="w-full sm:w-auto"
             >
-              <Compare className="mr-2" />
+              <GitCompare className="mr-2" />
               Compare Images
             </Button>
           </div>
