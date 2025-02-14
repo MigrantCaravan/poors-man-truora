@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { CameraCapture } from '@/components/CameraCapture';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Compare } from 'lucide-react';
 
 const Index = () => {
   const [selfieImage, setSelfieImage] = useState<string | null>(null);
@@ -15,6 +17,11 @@ const Index = () => {
   const handleIdCaptured = (image: string) => {
     setIdImage(image);
     console.log('ID captured:', image);
+  };
+
+  const handleCompare = () => {
+    console.log('Comparing images...');
+    // Add comparison logic here
   };
 
   return (
@@ -75,6 +82,24 @@ const Index = () => {
             )}
           </div>
         </div>
+
+        {/* Comparison Card */}
+        <Card className="p-6">
+          <div className="text-center space-y-4">
+            <h2 className="text-xl font-semibold">Verify Identity</h2>
+            <p className="text-gray-600">
+              Click the button below to compare your selfie with your ID photo
+            </p>
+            <Button 
+              onClick={handleCompare}
+              disabled={!selfieImage || !idImage}
+              className="w-full sm:w-auto"
+            >
+              <Compare className="mr-2" />
+              Compare Images
+            </Button>
+          </div>
+        </Card>
       </div>
     </div>
   );
