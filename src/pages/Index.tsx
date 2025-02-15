@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { GitCompare } from 'lucide-react';
 import * as blazeface from '@tensorflow-models/blazeface';
+import * as tf from '@tensorflow/tfjs';
 import { toast } from 'sonner';
 
 const Index = () => {
@@ -32,7 +33,6 @@ const Index = () => {
   };
 
   const getFaceFeatures = (prediction: any): Float32Array => {
-    // Extract landmarks and flatten them into a feature vector
     const landmarks = prediction.landmarks || [];
     const features = landmarks.flat();
     return new Float32Array(features);
@@ -57,16 +57,23 @@ const Index = () => {
     
     setIsComparing(true);
     try {
+      // Initialize TensorFlow.js
+      await tf.ready();
+      console.log('TensorFlow.js initialized');
+
       // Load BlazeFace model
       const model = await blazeface.load();
+      console.log('BlazeFace model loaded');
 
       // Load images
       const selfieImg = await loadImage(selfieImage);
       const idImg = await loadImage(idImage);
+      console.log('Images loaded');
 
       // Get predictions for both images
       const selfiePrediction = await model.estimateFaces(selfieImg, false);
       const idPrediction = await model.estimateFaces(idImg, false);
+      console.log('Face predictions obtained:', { selfiePrediction, idPrediction });
 
       if (selfiePrediction.length === 0 || idPrediction.length === 0) {
         toast.error("No face detected in one or both images. Please try again.");
@@ -76,9 +83,11 @@ const Index = () => {
       // Extract face features and calculate similarity
       const selfieFeatures = getFaceFeatures(selfiePrediction[0]);
       const idFeatures = getFaceFeatures(idPrediction[0]);
+      console.log('Features extracted');
 
       // Calculate similarity score
       const similarity = calculateSimilarity(selfieFeatures, idFeatures);
+      console.log('Similarity calculated:', similarity);
 
       // Convert to percentage and show result
       const confidenceScore = Math.round(similarity * 100);
