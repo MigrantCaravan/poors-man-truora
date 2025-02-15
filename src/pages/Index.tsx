@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CameraCapture } from '@/components/CameraCapture';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { GitCompare, Loader2 } from 'lucide-react';
+import { GitCompare, Loader2, RotateCcw } from 'lucide-react';
 import * as blazeface from '@tensorflow-models/blazeface';
 import * as tf from '@tensorflow/tfjs';
 import { toast } from 'sonner';
@@ -112,6 +112,13 @@ const Index = () => {
     }
   };
 
+  const handleReset = () => {
+    setSelfieImage(null);
+    setIdImage(null);
+    setComparisonResult({ score: 0, status: null });
+    setIsComparing(false);
+  };
+
   return (
     <div className="min-h-screen p-4 bg-gray-50">
       <div className="max-w-3xl mx-auto space-y-8">
@@ -196,51 +203,64 @@ const Index = () => {
         </Card>
 
         {(comparisonResult.status || isComparing) && (
-          <Card className="p-6">
-            <div className="text-center space-y-4">
-              <h2 className="text-xl font-semibold">Verification Results</h2>
-              
-              {isComparing ? (
-                <div className="space-y-4">
-                  <p className="text-gray-600">Processing your images...</p>
-                  <Progress value={100} className="w-full animate-pulse" />
-                </div>
-              ) : comparisonResult.status === 'success' ? (
-                <div className="space-y-2">
-                  <p className="text-2xl font-bold text-green-600">
-                    Identity Verified
-                  </p>
-                  <p className="text-gray-600">
-                    Match confidence: {comparisonResult.score}%
-                  </p>
-                  <Progress 
-                    value={comparisonResult.score} 
-                    className="w-full"
-                  />
-                </div>
-              ) : comparisonResult.status === 'error' && (
-                <div className="space-y-2">
-                  <p className="text-2xl font-bold text-red-600">
-                    Verification Failed
-                  </p>
-                  {comparisonResult.score > 0 && (
-                    <>
-                      <p className="text-gray-600">
-                        Low match confidence: {comparisonResult.score}%
-                      </p>
-                      <Progress 
-                        value={comparisonResult.score} 
-                        className="w-full"
-                      />
-                    </>
-                  )}
-                  <p className="text-gray-600">
-                    Please ensure both images are clear and try again.
-                  </p>
-                </div>
-              )}
+          <>
+            <Card className="p-6">
+              <div className="text-center space-y-4">
+                <h2 className="text-xl font-semibold">Verification Results</h2>
+                
+                {isComparing ? (
+                  <div className="space-y-4">
+                    <p className="text-gray-600">Processing your images...</p>
+                    <Progress value={100} className="w-full animate-pulse" />
+                  </div>
+                ) : comparisonResult.status === 'success' ? (
+                  <div className="space-y-2">
+                    <p className="text-2xl font-bold text-green-600">
+                      Identity Verified
+                    </p>
+                    <p className="text-gray-600">
+                      Match confidence: {comparisonResult.score}%
+                    </p>
+                    <Progress 
+                      value={comparisonResult.score} 
+                      className="w-full"
+                    />
+                  </div>
+                ) : comparisonResult.status === 'error' && (
+                  <div className="space-y-2">
+                    <p className="text-2xl font-bold text-red-600">
+                      Verification Failed
+                    </p>
+                    {comparisonResult.score > 0 && (
+                      <>
+                        <p className="text-gray-600">
+                          Low match confidence: {comparisonResult.score}%
+                        </p>
+                        <Progress 
+                          value={comparisonResult.score} 
+                          className="w-full"
+                        />
+                      </>
+                    )}
+                    <p className="text-gray-600">
+                      Please ensure both images are clear and try again.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </Card>
+            
+            <div className="text-center">
+              <Button 
+                onClick={handleReset}
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Reset Application
+              </Button>
             </div>
-          </Card>
+          </>
         )}
       </div>
     </div>
