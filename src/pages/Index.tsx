@@ -1,17 +1,21 @@
-
 import { useState } from 'react';
 import { CameraCapture } from '@/components/CameraCapture';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { GitCompare } from 'lucide-react';
+import { GitCompare, Loader2 } from 'lucide-react';
 import * as blazeface from '@tensorflow-models/blazeface';
 import * as tf from '@tensorflow/tfjs';
 import { toast } from 'sonner';
+import { Progress } from '@/components/ui/progress';
 
 const Index = () => {
   const [selfieImage, setSelfieImage] = useState<string | null>(null);
   const [idImage, setIdImage] = useState<string | null>(null);
   const [isComparing, setIsComparing] = useState(false);
+  const [comparisonResult, setComparisonResult] = useState<{
+    score: number;
+    status: 'success' | 'error' | null;
+  }>({ score: 0, status: null });
 
   const handleSelfieCaptured = (image: string) => {
     setSelfieImage(image);
@@ -56,6 +60,8 @@ const Index = () => {
     if (!selfieImage || !idImage) return;
     
     setIsComparing(true);
+    setComparisonResult({ score: 0, status: null });
+
     try {
       // Initialize TensorFlow.js
       await tf.ready();
@@ -76,6 +82,7 @@ const Index = () => {
       console.log('Face predictions obtained:', { selfiePrediction, idPrediction });
 
       if (selfiePrediction.length === 0 || idPrediction.length === 0) {
+        setComparisonResult({ score: 0, status: 'error' });
         toast.error("No face detected in one or both images. Please try again.");
         return;
       }
@@ -91,15 +98,14 @@ const Index = () => {
 
       // Convert to percentage and show result
       const confidenceScore = Math.round(similarity * 100);
-      
-      if (confidenceScore >= 80) {
-        toast.success(`Match confidence: ${confidenceScore}%`);
-      } else {
-        toast.error(`Low match confidence: ${confidenceScore}%`);
-      }
+      setComparisonResult({ 
+        score: confidenceScore, 
+        status: confidenceScore >= 80 ? 'success' : 'error' 
+      });
 
     } catch (error) {
       console.error('Comparison error:', error);
+      setComparisonResult({ score: 0, status: 'error' });
       toast.error('Error comparing images. Please try again.');
     } finally {
       setIsComparing(false);
@@ -112,7 +118,6 @@ const Index = () => {
         <h1 className="text-2xl font-bold text-center">ID Verification</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Selfie Section */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-center">Take a Selfie</h2>
             {selfieImage ? (
@@ -138,7 +143,6 @@ const Index = () => {
             )}
           </div>
 
-          {/* ID Section */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-center">Scan Your ID</h2>
             {idImage ? (
@@ -165,7 +169,6 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Comparison Card */}
         <Card className="p-6">
           <div className="text-center space-y-4">
             <h2 className="text-xl font-semibold">Verify Identity</h2>
@@ -177,11 +180,68 @@ const Index = () => {
               disabled={!selfieImage || !idImage || isComparing}
               className="w-full sm:w-auto"
             >
-              <GitCompare className={`mr-2 ${isComparing ? 'animate-spin' : ''}`} />
-              {isComparing ? 'Comparing...' : 'Compare Images'}
+              {isComparing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Comparing...
+                </>
+              ) : (
+                <>
+                  <GitCompare className="mr-2" />
+                  Compare Images
+                </>
+              )}
             </Button>
           </div>
         </Card>
+
+        {(comparisonResult.status || isComparing) && (
+          <Card className="p-6">
+            <div className="text-center space-y-4">
+              <h2 className="text-xl font-semibold">Verification Results</h2>
+              
+              {isComparing ? (
+                <div className="space-y-4">
+                  <p className="text-gray-600">Processing your images...</p>
+                  <Progress value={100} className="w-full animate-pulse" />
+                </div>
+              ) : comparisonResult.status === 'success' ? (
+                <div className="space-y-2">
+                  <p className="text-2xl font-bold text-green-600">
+                    Identity Verified
+                  </p>
+                  <p className="text-gray-600">
+                    Match confidence: {comparisonResult.score}%
+                  </p>
+                  <Progress 
+                    value={comparisonResult.score} 
+                    className="w-full"
+                  />
+                </div>
+              ) : comparisonResult.status === 'error' && (
+                <div className="space-y-2">
+                  <p className="text-2xl font-bold text-red-600">
+                    Verification Failed
+                  </p>
+                  {comparisonResult.score > 0 && (
+                    <>
+                      <p className="text-gray-600">
+                        Low match confidence: {comparisonResult.score}%
+                      </p>
+                      <Progress 
+                        value={comparisonResult.score} 
+                        className="w-full"
+                      />
+                    </>
+                  )}
+                  <p className="text-gray-600">
+                    Please ensure both images are clear and try again.
+                  </p>
+                </div>
+              )}
+            </div>
+          </Card>
+        )}
       </div>
     </div>
   );
