@@ -31,6 +31,13 @@ const Index = () => {
     });
   };
 
+  const getFaceFeatures = (prediction: any): Float32Array => {
+    // Extract landmarks and flatten them into a feature vector
+    const landmarks = prediction.landmarks || [];
+    const features = landmarks.flat();
+    return new Float32Array(features);
+  };
+
   const calculateSimilarity = (features1: Float32Array, features2: Float32Array): number => {
     let dotProduct = 0;
     let norm1 = 0;
@@ -66,11 +73,12 @@ const Index = () => {
         return;
       }
 
+      // Extract face features and calculate similarity
+      const selfieFeatures = getFaceFeatures(selfiePrediction[0]);
+      const idFeatures = getFaceFeatures(idPrediction[0]);
+
       // Calculate similarity score
-      const similarity = calculateSimilarity(
-        new Float32Array(selfiePrediction[0].probability),
-        new Float32Array(idPrediction[0].probability)
-      );
+      const similarity = calculateSimilarity(selfieFeatures, idFeatures);
 
       // Convert to percentage and show result
       const confidenceScore = Math.round(similarity * 100);
