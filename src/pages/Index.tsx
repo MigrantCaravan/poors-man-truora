@@ -1,13 +1,12 @@
-
-import { useState } from 'react';
-import { CameraCapture } from '@/components/CameraCapture';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { GitCompare, Loader2, RotateCcw } from 'lucide-react';
-import * as blazeface from '@tensorflow-models/blazeface';
-import * as tf from '@tensorflow/tfjs';
-import { toast } from 'sonner';
-import { Progress } from '@/components/ui/progress';
+import { useState } from "react";
+import { CameraCapture } from "@/components/CameraCapture";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { GitCompare, Loader2, RotateCcw } from "lucide-react";
+import * as blazeface from "@tensorflow-models/blazeface";
+import * as tf from "@tensorflow/tfjs";
+import { toast } from "sonner";
+import { Progress } from "@/components/ui/progress";
 
 const Index = () => {
   const [selfieImage, setSelfieImage] = useState<string | null>(null);
@@ -15,17 +14,17 @@ const Index = () => {
   const [isComparing, setIsComparing] = useState(false);
   const [comparisonResult, setComparisonResult] = useState<{
     score: number;
-    status: 'success' | 'error' | null;
+    status: "success" | "error" | null;
   }>({ score: 0, status: null });
 
   const handleSelfieCaptured = (image: string) => {
     setSelfieImage(image);
-    console.log('Selfie captured:', image);
+    console.log("Selfie captured:", image);
   };
 
   const handleIdCaptured = (image: string) => {
     setIdImage(image);
-    console.log('ID captured:', image);
+    console.log("ID captured:", image);
   };
 
   const loadImage = (src: string): Promise<HTMLImageElement> => {
@@ -37,77 +36,85 @@ const Index = () => {
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getFaceFeatures = (prediction: any): Float32Array => {
     const landmarks = prediction.landmarks || [];
     const features = landmarks.flat();
     return new Float32Array(features);
   };
 
-  const calculateSimilarity = (features1: Float32Array, features2: Float32Array): number => {
+  const calculateSimilarity = (
+    features1: Float32Array,
+    features2: Float32Array
+  ): number => {
     let dotProduct = 0;
     let norm1 = 0;
     let norm2 = 0;
-    
+
     for (let i = 0; i < features1.length; i++) {
       dotProduct += features1[i] * features2[i];
       norm1 += features1[i] * features1[i];
       norm2 += features2[i] * features2[i];
     }
-    
+
     return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
   };
 
   const handleCompare = async () => {
     if (!selfieImage || !idImage) return;
-    
+
     setIsComparing(true);
     setComparisonResult({ score: 0, status: null });
 
     try {
       // Initialize TensorFlow.js
       await tf.ready();
-      console.log('TensorFlow.js initialized');
+      console.log("TensorFlow.js initialized");
 
       // Load BlazeFace model
       const model = await blazeface.load();
-      console.log('BlazeFace model loaded');
+      console.log("BlazeFace model loaded");
 
       // Load images
       const selfieImg = await loadImage(selfieImage);
       const idImg = await loadImage(idImage);
-      console.log('Images loaded');
+      console.log("Images loaded");
 
       // Get predictions for both images
       const selfiePrediction = await model.estimateFaces(selfieImg, false);
       const idPrediction = await model.estimateFaces(idImg, false);
-      console.log('Face predictions obtained:', { selfiePrediction, idPrediction });
+      console.log("Face predictions obtained:", {
+        selfiePrediction,
+        idPrediction,
+      });
 
       if (selfiePrediction.length === 0 || idPrediction.length === 0) {
-        setComparisonResult({ score: 0, status: 'error' });
-        toast.error("No face detected in one or both images. Please try again.");
+        setComparisonResult({ score: 0, status: "error" });
+        toast.error(
+          "No face detected in one or both images. Please try again."
+        );
         return;
       }
 
       // Extract face features and calculate similarity
       const selfieFeatures = getFaceFeatures(selfiePrediction[0]);
       const idFeatures = getFaceFeatures(idPrediction[0]);
-      console.log('Features extracted');
+      console.log("Features extracted");
 
       // Calculate similarity score
       const similarity = calculateSimilarity(selfieFeatures, idFeatures);
-      console.log('Similarity calculated:', similarity);
+      console.log("Similarity calculated:", similarity);
 
       // Convert to percentage and show result
       const confidenceScore = Math.round(similarity * 100);
-      setComparisonResult({ 
-        score: confidenceScore, 
-        status: confidenceScore >= 80 ? 'success' : 'error' 
+      setComparisonResult({
+        score: confidenceScore,
+        status: confidenceScore >= 80 ? "success" : "error",
       });
-
     } catch (error) {
-      console.error('Comparison error:', error);
-      setComparisonResult({ score: 0, status: 'error' });
-      toast.error('Error comparing images. Please try again.');
+      console.error("Comparison error:", error);
+      setComparisonResult({ score: 0, status: "error" });
+      toast.error("Error comparing images. Please try again.");
     } finally {
       setIsComparing(false);
     }
@@ -123,17 +130,19 @@ const Index = () => {
   return (
     <div className="min-h-screen p-4 bg-gray-50">
       <div className="max-w-3xl mx-auto space-y-8">
-        <h1 className="text-2xl font-bold text-center">ID Verification</h1>
-        
+        <h1 className="text-2xl font-bold text-center">
+          Me Colabora Con La Cédula (Verificación de Identidad)
+        </h1>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Selfie Section */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-center">Take a Selfie</h2>
             {selfieImage ? (
               <Card className="p-4">
-                <img 
-                  src={selfieImage} 
-                  alt="Captured Selfie" 
+                <img
+                  src={selfieImage}
+                  alt="Captured Selfie"
                   className="w-full rounded-lg"
                 />
                 <button
@@ -155,12 +164,14 @@ const Index = () => {
           {/* ID Section - Only show when selfie is captured */}
           {selfieImage && (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-center">Scan Your ID</h2>
+              <h2 className="text-xl font-semibold text-center">
+                Scan Your ID
+              </h2>
               {idImage ? (
                 <Card className="p-4">
-                  <img 
-                    src={idImage} 
-                    alt="Captured ID" 
+                  <img
+                    src={idImage}
+                    alt="Captured ID"
                     className="w-full rounded-lg"
                   />
                   <button
@@ -184,11 +195,12 @@ const Index = () => {
         {/* Comparison Card */}
         <Card className="p-6">
           <div className="text-center space-y-4">
-            <h2 className="text-xl font-semibold">Verify Identity</h2>
+            <h2 className="text-xl font-semibold">Verificar Identidad</h2>
             <p className="text-gray-600">
-              Click the button below to compare your selfie with your ID photo
+              Haz click en el botón para comparar tu selfie con tu foto de la
+              cédula u otra foto
             </p>
-            <Button 
+            <Button
               onClick={handleCompare}
               disabled={!selfieImage || !idImage || isComparing}
               className="w-full sm:w-auto"
@@ -196,12 +208,12 @@ const Index = () => {
               {isComparing ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Comparing...
+                  Comparando...
                 </>
               ) : (
                 <>
                   <GitCompare className="mr-2" />
-                  Compare Images
+                  Comparar Imágenes
                 </>
               )}
             </Button>
@@ -213,58 +225,63 @@ const Index = () => {
           <>
             <Card className="p-6">
               <div className="text-center space-y-4">
-                <h2 className="text-xl font-semibold">Verification Results</h2>
-                
+                <h2 className="text-xl font-semibold">
+                  Resultados de la Verificación
+                </h2>
+
                 {isComparing ? (
                   <div className="space-y-4">
-                    <p className="text-gray-600">Processing your images...</p>
+                    <p className="text-gray-600">Procesando tus imágenes...</p>
                     <Progress value={100} className="w-full animate-pulse" />
                   </div>
-                ) : comparisonResult.status === 'success' ? (
+                ) : comparisonResult.status === "success" ? (
                   <div className="space-y-2">
                     <p className="text-2xl font-bold text-green-600">
-                      Identity Verified
+                      Identidad Verificada
                     </p>
                     <p className="text-gray-600">
-                      Match confidence: {comparisonResult.score}%
+                      Nivel de confianza: {comparisonResult.score}%
                     </p>
-                    <Progress 
-                      value={comparisonResult.score} 
+                    <Progress
+                      value={comparisonResult.score}
                       className="w-full"
                     />
                   </div>
-                ) : comparisonResult.status === 'error' && (
-                  <div className="space-y-2">
-                    <p className="text-2xl font-bold text-red-600">
-                      Verification Failed
-                    </p>
-                    {comparisonResult.score > 0 && (
-                      <>
-                        <p className="text-gray-600">
-                          Low match confidence: {comparisonResult.score}%
-                        </p>
-                        <Progress 
-                          value={comparisonResult.score} 
-                          className="w-full"
-                        />
-                      </>
-                    )}
-                    <p className="text-gray-600">
-                      Please ensure both images are clear and try again.
-                    </p>
-                  </div>
+                ) : (
+                  comparisonResult.status === "error" && (
+                    <div className="space-y-2">
+                      <p className="text-2xl font-bold text-red-600">
+                        Verificación Fallida
+                      </p>
+                      {comparisonResult.score > 0 && (
+                        <>
+                          <p className="text-gray-600">
+                            Bajo nivel de confianza: {comparisonResult.score}%
+                          </p>
+                          <Progress
+                            value={comparisonResult.score}
+                            className="w-full"
+                          />
+                        </>
+                      )}
+                      <p className="text-gray-600">
+                        Por favor, asegúrate de que ambas imágenes sean claras y
+                        vuelve a intentarlo.
+                      </p>
+                    </div>
+                  )
                 )}
               </div>
             </Card>
-            
+
             <div className="text-center">
-              <Button 
+              <Button
                 onClick={handleReset}
                 variant="outline"
                 className="w-full sm:w-auto"
               >
                 <RotateCcw className="mr-2 h-4 w-4" />
-                Reset Application
+                Reiniciar Aplicación
               </Button>
             </div>
           </>
