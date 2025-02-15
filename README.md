@@ -1,69 +1,74 @@
-# Welcome to your Lovable project
+# Face Detection App
 
-## Project info
+A web application that uses TensorFlow.js and the BlazeFace model to detect faces in real-time using your device's camera.
 
-**URL**: https://lovable.dev/projects/a3880159-0186-4370-ae1b-25d7cba5b997
+deployed on Vercel: https://celador-app.vercel.app/
 
-## How can I edit this code?
+## Technologies Used
 
-There are several ways of editing your application.
+This project is built with modern web technologies:
 
-**Use Lovable**
+- **React** - UI library for building the interface
+- **TypeScript** - For type-safe code
+- **TensorFlow.js** - Machine learning framework for the web
+- **BlazeFace** - ML model for fast and accurate face detection
+- **Vite** - Next generation frontend tooling
+- **shadcn/ui** - High-quality React components built with Radix UI and Tailwind
+- **Tailwind CSS** - Utility-first CSS framework
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a3880159-0186-4370-ae1b-25d7cba5b997) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+There are several ways to run this application:
 
-**Use your preferred IDE**
+### Local Development
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Requirements:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+- Node.js & npm - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to the project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Using GitHub Codespaces
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. Navigate to the repository's main page
+2. Click the "Code" button
+3. Select the "Codespaces" tab
+4. Click "New codespace"
+5. Once loaded, run `npm install` and `npm run dev`
 
-**Use GitHub Codespaces**
+## Deployment
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Using Lovable
 
-## What technologies are used for this project?
+The easiest way to deploy this project is through [Lovable](https://lovable.dev/projects/a3880159-0186-4370-ae1b-25d7cba5b997):
 
-This project is built with .
+1. Open the project in Lovable
+2. Click on Share -> Publish
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Custom Domain
 
-## How can I deploy this project?
+While Lovable doesn't support custom domains yet, you can deploy to Netlify for custom domain support. See the [Custom domains documentation](https://docs.lovable.dev/tips-tricks/custom-domain/) for more details.
 
-Simply open [Lovable](https://lovable.dev/projects/a3880159-0186-4370-ae1b-25d7cba5b997) and click on Share -> Publish.
+## Development with Lovable
 
-## I want to use a custom domain - is that possible?
+You can continue developing this project using Lovable's AI-assisted development platform:
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+- Visit the [Lovable Project](https://lovable.dev/projects/a3880159-0186-4370-ae1b-25d7cba5b997)
+- Make changes through the platform
+- Changes will be automatically committed to this repository
+
+## Contributing
+
+Feel free to submit issues and pull requests to improve the application.
